@@ -4,7 +4,6 @@ import com.sparta.memo.dto.MemoRequestDto;
 import com.sparta.memo.dto.MemoResponseDto;
 import com.sparta.memo.entity.Memo;
 import com.sparta.memo.repository.MemoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +14,6 @@ public class MemoService {
 
     private final MemoRepository memoRepository;
 
-    @Autowired
     public MemoService(MemoRepository memoRepository) {
         this.memoRepository = memoRepository;
     }
@@ -28,7 +26,7 @@ public class MemoService {
         Memo saveMemo = memoRepository.save(memo);
 
         // Entity -> ResponseDto
-        MemoResponseDto memoResponseDto = new MemoResponseDto(memo);
+        MemoResponseDto memoResponseDto = new MemoResponseDto(saveMemo);
 
         return memoResponseDto;
     }
@@ -36,6 +34,10 @@ public class MemoService {
     public List<MemoResponseDto> getMemos() {
         // DB 조회
         return memoRepository.findAllByOrderByModifiedAtDesc().stream().map(MemoResponseDto::new).toList();
+    }
+
+    public List<MemoResponseDto> getMemosByKeyword(String keyword) {
+        return memoRepository.findAllByContentsContainsOrderByModifiedAtDesc(keyword).stream().map(MemoResponseDto::new).toList();
     }
 
     @Transactional
